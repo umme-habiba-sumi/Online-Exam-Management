@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In - Online Exam Management System</title>
+<link rel="stylesheet" href="assets/css/style.css?v=20260720i">
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-main">
+    <div class="auth-card">
+      <div class="brand-mark"><span class="dot"></span> ExamPortal — IU Kushtia</div>
+      <div class="eyebrow">Welcome back</div>
+      <h1>Sign in to your account</h1>
+      <div class="hint">Enter your credentials to continue.</div>
+
+      <div class="role-toggle" role="group" aria-label="Login as">
+        <button type="button" class="role-option active" data-role="student">Student</button>
+        <button type="button" class="role-option" data-role="admin">Admin / Teacher</button>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <input type="hidden" id="roleInput" value="student">
+
+        <div class="field" id="loginStudentWrap">
+          <label for="studentId">Student ID</label>
+          <input type="text" id="studentId" placeholder="e.g. 20-A-114" required autocomplete="username">
+        </div>
+
+        <div class="field" id="loginEmailWrap" hidden>
+          <label for="email">Email address</label>
+          <input type="email" id="email" placeholder="teacher@gmail.com" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required minlength="6" autocomplete="current-password">
+        </div>
+
+        <div style="text-align:right; margin-top:-10px; margin-bottom:20px;">
+          <a href="forgot-password.html" style="color:var(--navy); font-weight:600; font-size:13px;">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-primary">Sign in</button>
+      </form>
+
+      <div class="form-foot">
+        Accounts are created by the department admin.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="errorModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Sign in failed</h3></div>
+    <p id="errorModalMessage" style="padding: 4px 22px 20px;">Something went wrong.</p>
+  </div>
+</div>
+
+<script src="assets/js/main.js?v=20260720t"></script>
+<script>
+  initRoleToggle();
+
+  function showErrorModal(message) {
+    const el = document.getElementById('errorModalMessage');
+    if (el) el.textContent = message || 'Something went wrong.';
+    openModal('errorModal');
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const role = document.getElementById('roleInput').value;
+    const email = document.getElementById('email');
+    const studentId = document.getElementById('studentId');
+    const password = document.getElementById('password');
+    const submitBtn = this.querySelector('button[type="submit"]');
+    let valid = true;
+
+    clearFieldError(email);
+    clearFieldError(studentId);
+    clearFieldError(password);
+
+    if (role === 'student') {
+      if (!studentId.value.trim()) {
+        showErrorModal('Enter your student ID.');
+        valid = false;
+      }
+    } else if (!email.value.includes('@')) {
+      showErrorModal('Enter a valid email address.');
+      valid = false;
+    }
+
+    if (password.value.length < 6) {
+      showErrorModal('Password must be at least 6 characters.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in…';
+
+    const payload = { password: password.value, role };
+    if (role === 'student') {
+      payload.student_id = studentId.value.trim();
+    } else {
+      payload.email = email.value.trim();
+    }
+
+    // #region agent log
+    fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'login-attempt',hypothesisId:'A',location:'login.html:submit',message:'login payload meta',data:{role:payload.role,hasStudentId:!!payload.student_id,studentIdLen:(payload.student_id||'').length,studentIdNorm:(payload.student_id||'').toUpperCase(),hasEmail:!!payload.email,passwordLen:(payload.password||'').length},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+
+    try {
+      const data = await api('auth/login.php', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      // #region agent log
+      fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'login-attempt',hypothesisId:'E',location:'login.html:success',message:'login ok',data:{redirect:data.redirect||'',userRole:(data.user&&data.user.role)||''},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      window.location.href = appUrl(data.redirect);
+    } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'login-attempt',hypothesisId:'C',location:'login.html:error',message:'login failed',data:{errMsg:String(err&&err.message||''),status:err&&err.status||0},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      showErrorModal(err.message || 'Sign in failed. Try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign in';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Result</title>
+<link rel="stylesheet" href="../assets/css/style.css?v=20260720f">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand-mark"><span class="dot"></span> ExamPortal</div>
+    <div class="side-label">Menu</div>
+    <a class="side-link" href="dashboard.html"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> My Exams</a>
+    <a class="side-link active" href="dashboard.html#results"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> My Results</a>
+  </aside>
+
+  <main class="main">
+    <header class="app-top-header">
+      <div class="header-breadcrumb">
+        <span class="crumb-root" id="breadcrumbRoot">Menu</span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-current" id="breadcrumbCurrent">Result</span>
+      </div>
+      <div class="header-right">
+        <button type="button" class="header-profile-chip" id="headerProfileBtn" aria-label="My profile">
+          <span class="profile-avatar-btn"><span id="headerProfileAvatar">?</span></span>
+          <span class="header-profile-text">
+            <span class="header-profile-name" id="headerProfileName">…</span>
+            <span class="header-profile-meta" id="headerProfileMeta">…</span>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-content">
+    <div class="content-toolbar">
+      <button class="btn-secondary" style="width:auto; padding:9px 16px;" onclick="location.href='dashboard.html'">Back to My Exams</button>
+    </div>
+    <div class="card" style="margin-bottom:22px;">
+      <div class="card-body">
+        <div class="score-ring-wrap">
+          <div>
+            <span class="score-num" id="scoreNum">–</span><span class="score-total" id="scoreTotal"> / –</span>
+          </div>
+          <div style="flex:1; min-width:220px;">
+            <div class="progress-track" style="height:8px;"><div class="progress-fill" id="scoreBar" style="width:0%; background:var(--green);"></div></div>
+            <div style="font-size:13px; color:var(--ink-soft); margin-top:8px;" id="scoreCaption"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Answer review</h3></div>
+      <div class="card-body" id="reviewList"></div>
+    </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/main.js?v=20260720r"></script>
+<script>
+  const attemptId = Number(new URLSearchParams(location.search).get('attempt_id') || 0);
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  async function signOut() {
+    try {
+      await api('auth/logout.php', { method: 'POST', body: '{}' });
+    } catch (_) {}
+    window.location.href = '../login.html';
+  }
+
+  (async () => {
+    try {
+      const me = await api('auth/me.php');
+      if (!me.user || me.user.role !== 'student') {
+        location.href = '../login.html';
+        return;
+      }
+      initAppHeader(me.user, 'student');
+    } catch (_) {
+      location.href = '../login.html';
+      return;
+    }
+
+    if (!attemptId) {
+      alert('Missing attempt id.');
+      location.href = 'dashboard.html';
+      return;
+    }
+
+    try {
+      const data = await api(`student/results/detail.php?attempt_id=${attemptId}`);
+      const r = data.result;
+      document.title = `Result - ${r.title}`;
+      updateBreadcrumb('Menu', r.title);
+      document.getElementById('scoreNum').textContent = r.score;
+      document.getElementById('scoreTotal').textContent = ` / ${r.total_marks}`;
+      document.getElementById('scoreBar').style.width = `${r.percent}%`;
+      document.getElementById('scoreCaption').textContent =
+        `${r.percent}% · ${r.correct_count} correct, ${r.incorrect_count} incorrect out of ${r.total_questions} questions`;
+
+      document.getElementById('reviewList').innerHTML = (r.review || []).map((item, i) => `
+        <div class="review-row">
+          <div class="review-mark ${item.ok ? 'correct' : 'wrong'}">${item.ok ? '✓' : '✕'}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;">${i + 1}. ${escapeHtml(item.question_text)}</div>
+            <div style="color:var(--ink-soft);">Your answer: <span style="color:${item.ok ? 'var(--green)' : 'var(--red)'}; font-weight:600;">${escapeHtml(item.your)}</span></div>
+            ${!item.ok ? `<div style="color:var(--ink-soft);">Correct answer: <span style="color:var(--green); font-weight:600;">${escapeHtml(item.correct)}</span></div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      alert(err.message || 'Could not load result.');
+      location.href = 'dashboard.html';
+    }
+  })();
+</script>
+
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <div class="modal-header"><h3>My Profile</h3></div>
+    <div style="padding: 8px 22px 0;">
+      <div class="profile-modal-head">
+        <div class="avatar-circle" id="profileModalAvatar">?</div>
+        <div>
+          <div style="font-size:17px; font-weight:600;" id="profileModalName"></div>
+          <span class="badge" id="profileModalBadge">Student</span>
+        </div>
+      </div>
+      <div class="info-grid" style="margin-bottom:8px;">
+        <div class="info-item"><div class="label">Role</div><div class="value" id="profileModalRole"></div></div>
+        <div class="info-item"><div class="label">Student ID</div><div class="value" id="profileModalId"></div></div>
+        <div class="info-item"><div class="label">Department</div><div class="value" id="profileModalDept"></div></div>
+        <div class="info-item"><div class="label">Email</div><div class="value" id="profileModalEmail"></div></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-primary" style="width:auto;" onclick="location.href='profile.html'">Full profile</button>
+      <button type="button" class="btn-primary" style="width:auto; background:#ff0000;" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal">
+    <h3>Sign out?</h3>
+    <p>You'll need to sign in again to access your dashboard.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('logoutModal')">Cancel</button>
+      <button class="btn-primary" style="width:auto; background:var(--red);" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

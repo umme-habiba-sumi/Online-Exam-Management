@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Online Exam Management System</title>
+<link rel="stylesheet" href="../assets/css/style.css?v=20260720p">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand-mark"><span class="dot"></span> ExamPortal</div>
+
+    <div class="side-label">Workspace</div>
+    <a class="side-link active" data-goto="overview"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></span> Overview</a>
+    <a class="side-link" data-goto="manage"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span> Manage Exams</a>
+    <a class="side-link" data-goto="create"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span> Create Exam</a>
+    <a class="side-link" data-goto="bank"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span> Question Bank</a>
+    <a class="side-link" data-goto="results"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Results</a>
+    <a class="side-link" data-goto="users"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Manage Users</a>
+  </aside>
+
+  <main class="main">
+    <header class="app-top-header">
+      <div class="header-breadcrumb">
+        <span class="crumb-root" id="breadcrumbRoot">Workspace</span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-current" id="breadcrumbCurrent">Overview</span>
+      </div>
+      <div class="header-right">
+        <div class="notif-wrap">
+          <button type="button" class="notif-btn" id="notifBtn" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notif-badge" id="notifBadge" hidden>0</span>
+          </button>
+        </div>
+        <button type="button" class="header-profile-chip" id="headerProfileBtn" aria-label="My profile">
+          <span class="profile-avatar-btn"><span id="headerProfileAvatar">?</span></span>
+          <span class="header-profile-text">
+            <span class="header-profile-name" id="headerProfileName">…</span>
+            <span class="header-profile-meta" id="headerProfileMeta">…</span>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-content">
+    <!-- OVERVIEW -->
+    <div class="tab-panel active" id="overview">
+      <div class="stat-row" id="statRow"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Recent exams</h3>
+          <button type="button" class="btn-primary" style="width:auto; padding:9px 16px;" onclick="goto('create')">+ New exam</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table id="overviewTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANAGE EXAMS -->
+    <div class="tab-panel" id="manage">
+      <div class="card">
+        <div class="card-head">
+          <h3>All exams</h3>
+          <button type="button" class="btn-primary" style="width:auto; padding:9px 16px;" onclick="goto('create')">+ New exam</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table id="manageTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE EXAM -->
+    <div class="tab-panel" id="create">
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head"><h3>Exam details</h3></div>
+        <div class="card-body">
+          <form id="examForm" novalidate>
+            <div style="display:grid; grid-template-columns:2fr 1fr; gap:14px;">
+              <div class="field">
+                <label for="examTitle">Exam title</label>
+                <input type="text" id="examTitle" placeholder="e.g. Data Structures - Midterm" required>
+              </div>
+              <div class="field">
+                <label for="examSubject">Subject code</label>
+                <input type="text" id="examSubject" placeholder="CSE-2103" required>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+              <div class="field">
+                <label for="examDuration">Duration (minutes)</label>
+                <input type="number" id="examDuration" min="1" value="30" required>
+              </div>
+              <div class="field">
+                <label for="examMarks">Total marks</label>
+                <input type="number" id="examMarks" min="1" value="30" required>
+              </div>
+              <div class="field">
+                <label for="examStart">Start time</label>
+                <input type="datetime-local" id="examStart" required>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Questions</h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-secondary" type="button" id="importBankBtn">+ From bank</button>
+            <button class="btn-secondary" type="button" id="addQuestionBtn">+ Add question</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="questionList"></div>
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px; flex-wrap:wrap;">
+            <button type="button" class="btn-secondary" id="draftBtn">Save as draft</button>
+            <button type="button" class="btn-primary" style="width:auto;" id="publishBtn">Publish exam</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION BANK -->
+    <div class="tab-panel" id="bank">
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head"><h3>Add to question bank</h3></div>
+        <div class="card-body">
+          <form id="addBankForm" novalidate>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="field">
+                <label for="bankSubject">Subject code</label>
+                <input type="text" id="bankSubject" placeholder="CSE-2103" required>
+              </div>
+              <div class="field">
+                <label for="bankTopic">Topic</label>
+                <input type="text" id="bankTopic" placeholder="e.g. Linked Lists">
+              </div>
+            </div>
+            <div class="field">
+              <label for="bankQuestionText">Question</label>
+              <input type="text" id="bankQuestionText" placeholder="Type the question text..." required>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="field"><label for="bankOptA">Option A</label><input type="text" id="bankOptA" required></div>
+              <div class="field"><label for="bankOptB">Option B</label><input type="text" id="bankOptB" required></div>
+              <div class="field"><label for="bankOptC">Option C</label><input type="text" id="bankOptC" required></div>
+              <div class="field"><label for="bankOptD">Option D</label><input type="text" id="bankOptD" required></div>
+            </div>
+            <div class="field">
+              <label for="bankCorrect">Correct option</label>
+              <select id="bankCorrect" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px;">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+            <div style="display:flex; justify-content:flex-end;">
+              <button type="submit" class="btn-primary" style="width:auto; padding:11px 20px;">Add question</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Question bank</h3>
+          <select id="bankFilter" style="padding:8px 10px; border:1px solid var(--line); border-radius:6px; font-size:13px;">
+            <option value="all">All subjects</option>
+          </select>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table id="bankTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="tab-panel" id="results">
+      <div class="card">
+        <div class="card-head">
+          <h3>Student results</h3>
+          <select id="resultFilter" style="padding:8px 10px; border:1px solid var(--line); border-radius:6px; font-size:13px;">
+            <option value="all">All exams</option>
+          </select>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table id="resultsTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANAGE USERS -->
+    <div class="tab-panel" id="users">
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head"><h3>Create a new account</h3></div>
+        <div class="card-body">
+          <div class="role-toggle" role="group" aria-label="Create account as" id="userRoleToggle">
+            <button type="button" class="role-option active" data-role="student">Student</button>
+            <button type="button" class="role-option" data-role="admin">Admin / Teacher</button>
+          </div>
+
+          <form id="createUserForm" novalidate>
+            <input type="hidden" id="userRoleInput" value="student">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="field">
+                <label for="userFullName">Full name</label>
+                <input type="text" id="userFullName" placeholder="e.g. Umme Habiba Sumi" required>
+              </div>
+              <div class="field" id="userRollField">
+                <label for="userRoll">Roll / Registration no.</label>
+                <input type="text" id="userRoll" placeholder="e.g. 25114128">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="field">
+                <label for="userEmail">Email address</label>
+                <input type="email" id="userEmail" placeholder="student@gmail.com" required>
+              </div>
+              <div class="field">
+                <label for="userPassword">Temporary password</label>
+                <input type="password" id="userPassword" placeholder="At least 6 characters" required minlength="6">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+              <button type="submit" class="btn-primary" style="width:auto; padding:11px 20px;">Verify email &amp; create</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>All users</h3>
+          <select id="userFilter" style="padding:8px 10px; border:1px solid var(--line); border-radius:6px; font-size:13px;">
+            <option value="all">All roles</option>
+            <option value="student">Students</option>
+            <option value="admin">Admins / Teachers</option>
+          </select>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table id="usersTable"></table>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Delete confirmation -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete this exam?</h3>
+    <p>This removes the exam along with its questions and any submitted results. This can't be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn-primary" style="width:auto; background:var(--red);" onclick="deleteExamConfirmed()">Delete exam</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit exam -->
+<div class="modal-overlay" id="editExamModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Edit exam</h3>
+    <form id="editExamForm" novalidate>
+      <input type="hidden" id="editExamId">
+      <div class="field">
+        <label for="editExamTitle">Exam title</label>
+        <input type="text" id="editExamTitle" required>
+      </div>
+      <div class="field">
+        <label for="editExamSubject">Subject code</label>
+        <input type="text" id="editExamSubject" required>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field">
+          <label for="editExamDuration">Duration (minutes)</label>
+          <input type="number" id="editExamDuration" min="1" required>
+        </div>
+        <div class="field">
+          <label for="editExamMarks">Total marks</label>
+          <input type="number" id="editExamMarks" min="1" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="editExamStart">Start time</label>
+        <input type="datetime-local" id="editExamStart" required>
+      </div>
+      <div class="field">
+        <label for="editExamStatus">Status</label>
+        <select id="editExamStatus" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px;">
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal('editExamModal')">Cancel</button>
+        <button type="submit" class="btn-primary" style="width:auto;">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Import from bank -->
+<div class="modal-overlay" id="importBankModal">
+  <div class="modal" style="max-width:560px;">
+    <h3>Import from question bank</h3>
+    <p style="color:var(--ink-soft); font-size:13px; margin-bottom:10px;">Select questions to add to this exam draft.</p>
+    <div id="importBankList" style="max-height:320px; overflow:auto; margin-bottom:14px;"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('importBankModal')">Cancel</button>
+      <button class="btn-primary" style="width:auto;" id="importBankConfirm">Add selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- View results quick summary -->
+<div class="modal-overlay" id="viewResultsModal">
+  <div class="modal">
+    <h3 id="viewResultsTitle">Exam results</h3>
+    <p id="viewResultsSummary"></p>
+    <div class="modal-actions">
+      <button class="btn-primary btn-danger" style="width:auto;" onclick="closeModal('viewResultsModal')">Close</button>
+      <button class="btn-primary" style="width:auto;" onclick="closeModal('viewResultsModal'); viewExamResults(window.pendingViewResultsExam);">View full results</button>
+    </div>
+  </div>
+</div>
+
+<!-- Attempt answer review -->
+<div class="modal-overlay" id="attemptReviewModal">
+  <div class="modal" style="max-width:640px;">
+    <h3 id="reviewModalTitle">Answer review</h3>
+    <p id="reviewModalMeta" style="color:var(--ink-soft); font-size:13px; margin-bottom:14px;"></p>
+    <div id="reviewModalBody" style="max-height:420px; overflow:auto;"></div>
+    <div class="modal-actions">
+      <button class="btn-primary btn-danger" style="width:auto;" onclick="closeModal('attemptReviewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit question -->
+<div class="modal-overlay" id="editQuestionModal">
+  <div class="modal" style="max-width:560px;">
+    <h3>Edit question</h3>
+    <form id="editQuestionForm" novalidate>
+      <input type="hidden" id="editQuestionId">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field">
+          <label for="editQuestionSubject">Subject</label>
+          <input type="text" id="editQuestionSubject" required>
+        </div>
+        <div class="field">
+          <label for="editQuestionTopic">Topic</label>
+          <input type="text" id="editQuestionTopic">
+        </div>
+      </div>
+      <div class="field">
+        <label for="editQuestionText">Question text</label>
+        <input type="text" id="editQuestionText" required>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field"><label for="editOptA">Option A</label><input type="text" id="editOptA" required></div>
+        <div class="field"><label for="editOptB">Option B</label><input type="text" id="editOptB" required></div>
+        <div class="field"><label for="editOptC">Option C</label><input type="text" id="editOptC" required></div>
+        <div class="field"><label for="editOptD">Option D</label><input type="text" id="editOptD" required></div>
+      </div>
+      <div class="field">
+        <label for="editCorrect">Correct option</label>
+        <select id="editCorrect" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px;">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal('editQuestionModal')">Cancel</button>
+        <button type="submit" class="btn-primary" style="width:auto;">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete question confirmation -->
+<div class="modal-overlay" id="deleteQuestionModal">
+  <div class="modal">
+    <h3>Delete this question?</h3>
+    <p>This removes it from the question bank. Exams that already include it keep their existing copy.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('deleteQuestionModal')">Cancel</button>
+      <button class="btn-primary" style="width:auto; background:var(--red);" onclick="deleteQuestionConfirmed()">Delete question</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit user -->
+<div class="modal-overlay" id="editUserModal">
+  <div class="modal">
+    <h3>Edit user</h3>
+    <form id="editUserForm" novalidate>
+      <input type="hidden" id="editUserId">
+      <div class="field">
+        <label for="editUserName">Full name</label>
+        <input type="text" id="editUserName" required>
+      </div>
+      <div class="field">
+        <label for="editUserRoll">Roll / ID</label>
+        <input type="text" id="editUserRoll">
+      </div>
+      <div class="field">
+        <label for="editUserEmail">Email address</label>
+        <input type="email" id="editUserEmail" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+        <button type="submit" class="btn-primary" style="width:auto;">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Remove user confirmation -->
+<div class="modal-overlay" id="removeUserModal">
+  <div class="modal">
+    <h3>Remove this user?</h3>
+    <p>They'll immediately lose access to their account. This can't be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('removeUserModal')">Cancel</button>
+      <button class="btn-primary" style="width:auto; background:var(--red);" onclick="removeUserConfirmed()">Remove user</button>
+    </div>
+  </div>
+</div>
+
+<!-- Publish confirmation -->
+<div class="modal-overlay" id="publishModal">
+  <div class="modal">
+    <h3>Exam published</h3>
+    <p>Students in the selected subject will see this exam on their dashboard once its start time arrives.</p>
+    <div class="modal-actions">
+      <button class="btn-primary" style="width:auto;" onclick="closeModal('publishModal'); goto('manage');">Go to Manage Exams</button>
+    </div>
+  </div>
+</div>
+
+<!-- Account created confirmation -->
+<div class="modal-overlay" id="userCreatedModal">
+  <div class="modal">
+    <h3>Account created</h3>
+    <p>The email was verified and the account is ready. Share the temporary password with the user securely.</p>
+    <div class="modal-actions">
+      <button class="btn-primary" style="width:auto;" onclick="closeModal('userCreatedModal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Verify email before creating account -->
+<div class="modal-overlay" id="verifyEmailModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Verify email</h3></div>
+    <p style="padding: 4px 22px 0;">A 6-digit code was sent to <strong id="verifyEmailTarget"></strong>. Enter it to confirm this mailbox is valid.</p>
+    <div style="padding: 8px 22px 0;">
+      <div class="field">
+        <label for="createUserOtp">Verification code</label>
+        <input type="text" id="createUserOtp" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="••••••" style="letter-spacing:8px; font-size:18px; text-align:center;">
+      </div>
+      <div id="createUserOtpHint" style="font-size:12.5px; color:var(--ink-soft); margin-top:-6px; margin-bottom:8px;"></div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" onclick="closeModal('verifyEmailModal')">Cancel</button>
+      <button type="button" class="btn-secondary" id="resendCreateOtpBtn">Resend code</button>
+      <button type="button" class="btn-primary" style="width:auto;" id="confirmCreateUserBtn">Verify &amp; create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sign out confirmation -->
+<div class="modal-overlay" id="notifModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header"><h3>Notifications</h3></div>
+    <div style="padding: 8px 22px 0;">
+      <div class="notif-modal-list" id="notifModalList">
+        <div class="notif-empty">Loading…</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="notifMarkAllBtn">Mark all read</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <div class="modal-header"><h3>My Profile</h3></div>
+    <div style="padding: 8px 22px 0;">
+      <div class="profile-modal-head">
+        <div class="avatar-circle" id="profileModalAvatar">?</div>
+        <div>
+          <div style="font-size:17px; font-weight:600;" id="profileModalName"></div>
+          <span class="badge" id="profileModalBadge">Admin / Teacher</span>
+        </div>
+      </div>
+      <div class="info-grid" style="margin-bottom:8px;">
+        <div class="info-item"><div class="label">Role</div><div class="value" id="profileModalRole"></div></div>
+        <div class="info-item"><div class="label">ID</div><div class="value" id="profileModalId"></div></div>
+        <div class="info-item"><div class="label">Department</div><div class="value" id="profileModalDept"></div></div>
+        <div class="info-item"><div class="label">Email</div><div class="value" id="profileModalEmail"></div></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-primary" style="width:auto;" onclick="location.href='profile.html'">Full profile</button>
+      <button type="button" class="btn-primary" style="width:auto; background:#ff0000;" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal">
+    <h3>Sign out?</h3>
+    <p>You'll need to sign in again to access the admin dashboard.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('logoutModal')">Cancel</button>
+      <button class="btn-primary" style="width:auto; background:var(--red);" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="errorModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Error</h3></div>
+    <p id="errorModalMessage" style="padding: 4px 22px 20px; white-space: pre-line;">Something went wrong.</p>
+  </div>
+</div>
+
+<script src="../assets/js/main.js?v=20260720t"></script>
+<script>
+  // #region agent log
+  fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'btn-move',hypothesisId:'A',location:'admin/dashboard.html:boot',message:'button placement audit',data:{headerActionBtns:document.querySelectorAll('.app-top-header .btn-primary, .app-top-header .btn-secondary').length,toolbarBtns:document.querySelectorAll('.content-toolbar button').length,newExamInHeader:!!Array.from(document.querySelectorAll('.app-top-header button')).find(b=>/New exam/i.test(b.textContent)),newExamInToolbar:!!Array.from(document.querySelectorAll('.content-toolbar button')).find(b=>/New exam/i.test(b.textContent))},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
+  function showErrorModal(message) {
+    const el = document.getElementById('errorModalMessage');
+    if (el) el.textContent = message || 'Something went wrong.';
+    // #region agent log
+    fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'error-modal',hypothesisId:'A,B',location:'admin/dashboard.html:showErrorModal',message:'error modal opened',data:{hasErrorModal:!!document.getElementById('errorModal'),msgLen:(message||'').length,inlineErrors:document.querySelectorAll('#createUserForm .error-text.show').length},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    openModal('errorModal');
+  }  const ADMIN_PAGES = {
+    overview: ['Admin Dashboard', 'Create, schedule, and grade exams for your courses.'],
+    manage: ['Manage Exams', 'View and edit all scheduled exams.'],
+    create: ['Create Exam', 'Build a new exam with questions and schedule.'],
+    bank: ['Question Bank', 'Reusable questions by subject.'],
+    results: ['Results', 'Review student attempts and scores.'],
+    users: ['Manage Users', 'Add students and teachers.']
+  };
+
+  initPanelNav(['overview', 'manage', 'create', 'bank', 'results', 'users'], ADMIN_PAGES, 'overview');
+
+  // #region agent log
+  document.querySelectorAll('.side-link[data-goto="create"]').forEach(link => {
+    link.addEventListener('click', () => {
+      requestAnimationFrame(() => {
+        const panel = document.getElementById('create');
+        const main = document.querySelector('.main-content');
+        const mcs = main ? getComputedStyle(main) : null;
+        fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'create-page',hypothesisId:'A,B',location:'admin/dashboard.html:createNav',message:'create exam page shown',data:{hasCreatePanel:!!panel,createActive:!!panel?.classList.contains('active'),hasModal:!!document.getElementById('createExamModal'),breadcrumb:document.getElementById('breadcrumbCurrent')?.textContent||'',mainScrollbarWidth:mcs&&mcs.scrollbarWidth,mainOverflowY:mcs&&mcs.overflowY},timestamp:Date.now()})}).catch(()=>{});
+      });
+    });
+  });
+  // #endregion
+
+  if (location.hash) {
+    const tab = location.hash.replace('#', '');
+    if (ADMIN_PAGES[tab]) {
+      goto(tab);
+    }
+  }
+
+  let usersCache = [];
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso.replace(' ', 'T'));
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  async function requireAdminSession() {
+    try {
+      const data = await api('auth/me.php');
+      if (!data.user || data.user.role !== 'admin') {
+        window.location.href = '../login.html';
+        return null;
+      }
+      initAppHeader(data.user, 'admin');
+      return data.user;
+    } catch (_) {
+      window.location.href = '../login.html';
+      return null;
+    }
+  }
+
+  async function signOut() {
+    // #region agent log
+    fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'signout-direct',hypothesisId:'A',location:'admin/dashboard.html:signOut',message:'direct signOut called',data:{logoutModalOpen:!!document.getElementById('logoutModal')?.classList.contains('open'),profileModalOpen:!!document.getElementById('profileModal')?.classList.contains('open')},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    try {
+      await api('auth/logout.php', { method: 'POST', body: '{}' });
+    } catch (_) { /* still leave */ }
+    window.location.href = '../login.html';
+  }
+
+  (async () => {
+    if (!(await requireAdminSession())) return;
+    loadExams();
+    loadBank();
+    loadResults();
+    loadUsers();
+  })();
+
+  // -------- Overview + Manage Exams (API) --------
+  let exams = [];
+
+  const stampFor = s => ({
+    live: '<span class="stamp live">Live</span>',
+    upcoming: '<span class="stamp upcoming">Upcoming</span>',
+    closed: '<span class="stamp closed">Closed</span>',
+    draft: '<span class="stamp draft">Draft</span>'
+  }[s] || '');
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function examRow(e, withActions) {
+    const status = e.display_status || e.status;
+    const publishBtn = e.status === 'draft'
+      ? `<button class="icon-btn" title="Publish" onclick="publishExam(${e.id})">&#9654;</button>`
+      : '';
+    return `<tr>
+      <td><strong>${escapeHtml(e.title)}</strong><br><span style="color:var(--ink-soft); font-size:12px;">${escapeHtml(e.subject)}</span></td>
+      <td>${e.questions} Qs &middot; ${e.marks} marks</td>
+      <td>${stampFor(status)}</td>
+      <td>${e.attempts} attempts</td>
+      ${withActions ? `<td class="row-actions">
+        ${publishBtn}
+        <button class="icon-btn" title="Edit" onclick="openEditExam(${e.id})">&#9998;</button>
+        <button class="icon-btn" title="View results" onclick="openViewResults(${e.id})">&#128200;</button>
+        <button class="icon-btn danger" title="Delete" onclick="confirmDelete(${e.id})">&#128465;</button>
+      </td>` : ''}
+    </tr>`;
+  }
+
+  function refreshExamTables() {
+    const liveCount = exams.filter(e => e.display_status === 'live').length;
+    const totalAttempts = exams.reduce((s, e) => s + (e.attempts || 0), 0);
+    const subjects = new Set(exams.map(e => e.subject).filter(Boolean));
+
+    document.getElementById('statRow').innerHTML = `
+      <div class="stat-card"><div class="num">${exams.length}</div><div class="label">Total exams created</div></div>
+      <div class="stat-card"><div class="num">${liveCount}</div><div class="label">Currently live</div></div>
+      <div class="stat-card"><div class="num">${totalAttempts}</div><div class="label">Total student attempts</div></div>
+      <div class="stat-card"><div class="num">${subjects.size}</div><div class="label">Subjects covered</div></div>
+    `;
+
+    const empty = '<tr><td colspan="5"><div class="empty-state"><div class="glyph">&#128196;</div><h4>No exams yet</h4><p>Create and publish an exam to see it here.</p></div></td></tr>';
+
+    document.getElementById('overviewTable').innerHTML =
+      '<tr><th>Exam</th><th>Scope</th><th>Status</th><th>Attempts</th></tr>' +
+      (exams.length ? exams.slice(0, 4).map(e => examRow(e, false)).join('') : empty.replace('colspan="5"', 'colspan="4"'));
+
+    document.getElementById('manageTable').innerHTML =
+      '<tr><th>Exam</th><th>Scope</th><th>Status</th><th>Attempts</th><th>Actions</th></tr>' +
+      (exams.length ? exams.map(e => examRow(e, true)).join('') : empty);
+
+    // #region agent log
+    (function () {
+      const stamps = Array.from(document.querySelectorAll('#manageTable .stamp')).map(el => ({
+        text: el.textContent.trim(),
+        cls: el.className,
+        color: getComputedStyle(el).color
+      }));
+      fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'status-colors',hypothesisId:'A',location:'admin/dashboard.html:refreshExamTables',message:'status stamp colors after paint',data:{stamps},timestamp:Date.now()})}).catch(()=>{});
+    })();
+    // #endregion
+  }
+
+  async function loadExams() {
+    try {
+      const data = await api('admin/exams/list.php');
+      exams = data.exams || [];
+      refreshExamTables();
+      refreshResultExamFilter();
+    } catch (err) {
+      document.getElementById('statRow').innerHTML = '';
+      document.getElementById('overviewTable').innerHTML =
+        `<tr><td colspan="4" style="padding:24px; color:var(--red);">${escapeHtml(err.message)}</td></tr>`;
+      document.getElementById('manageTable').innerHTML =
+        `<tr><td colspan="5" style="padding:24px; color:var(--red);">${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  function confirmDelete(id) {
+    window.pendingDeleteId = id;
+    openModal('deleteModal');
+  }
+
+  async function deleteExamConfirmed() {
+    const id = window.pendingDeleteId;
+    try {
+      await api('admin/exams/delete.php', {
+        method: 'POST',
+        body: JSON.stringify({ id })
+      });
+      closeModal('deleteModal');
+      await loadExams();
+    } catch (err) {
+      alert(err.message || 'Could not delete exam.');
+      closeModal('deleteModal');
+    }
+  }
+
+  function toDatetimeLocal(mysqlDt) {
+    if (!mysqlDt) return '';
+    return String(mysqlDt).replace(' ', 'T').slice(0, 16);
+  }
+
+  function openEditExam(id) {
+    const exam = exams.find(e => e.id === id);
+    if (!exam) return;
+    document.getElementById('editExamId').value = exam.id;
+    document.getElementById('editExamTitle').value = exam.title;
+    document.getElementById('editExamSubject').value = exam.subject;
+    document.getElementById('editExamDuration').value = exam.duration_minutes || 30;
+    document.getElementById('editExamMarks').value = exam.total_marks || exam.marks || 1;
+    document.getElementById('editExamStart').value = toDatetimeLocal(exam.start_time);
+    document.getElementById('editExamStatus').value = exam.status || 'draft';
+    openModal('editExamModal');
+  }
+
+  document.getElementById('editExamForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const id = Number(document.getElementById('editExamId').value);
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      await api('admin/exams/update.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          id,
+          title: document.getElementById('editExamTitle').value.trim(),
+          subject_code: document.getElementById('editExamSubject').value.trim(),
+          duration_minutes: Number(document.getElementById('editExamDuration').value) || 30,
+          total_marks: Number(document.getElementById('editExamMarks').value) || 1,
+          start_time: document.getElementById('editExamStart').value,
+          status: document.getElementById('editExamStatus').value
+        })
+      });
+      closeModal('editExamModal');
+      await loadExams();
+    } catch (err) {
+      alert(err.message || 'Update failed.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  async function publishExam(id) {
+    if (!confirm('Publish this draft exam for students?')) return;
+    try {
+      await api('admin/exams/publish.php', {
+        method: 'POST',
+        body: JSON.stringify({ id })
+      });
+      await loadExams();
+      openModal('publishModal');
+    } catch (err) {
+      alert(err.message || 'Could not publish exam.');
+    }
+  }
+
+  function openViewResults(id) {
+    const exam = exams.find(e => e.id === id);
+    if (!exam) return;
+    window.pendingViewResultsExam = exam.id;
+    document.getElementById('viewResultsTitle').textContent = exam.title;
+    document.getElementById('viewResultsSummary').textContent =
+      `${exam.attempts} student(s) have attempted this exam so far.`;
+    openModal('viewResultsModal');
+  }
+
+  // -------- Question bank (API) --------
+  let bankQuestions = [];
+
+  function paintBank(filter) {
+    const rows = bankQuestions.filter(q => filter === 'all' || q.subject === filter);
+    document.getElementById('bankTable').innerHTML =
+      '<tr><th>Question</th><th>Subject</th><th>Topic</th><th></th></tr>' +
+      (rows.length ? rows.map(q => `<tr>
+        <td>${escapeHtml(q.text)}</td>
+        <td><span class="badge">${escapeHtml(q.subject)}</span></td>
+        <td>${escapeHtml(q.topic || '—')}</td>
+        <td class="row-actions"><button class="icon-btn" title="Edit" onclick="openEditQuestion(${q.id})">&#9998;</button><button class="icon-btn danger" title="Delete" onclick="confirmDeleteQuestion(${q.id})">&#128465;</button></td>
+      </tr>`).join('')
+      : '<tr><td colspan="4"><div class="empty-state"><div class="glyph">&#128218;</div><h4>Bank is empty</h4><p>Add a question above, or publish an exam to archive its questions here.</p></div></td></tr>');
+  }
+
+  function refreshBankFilterOptions() {
+    const select = document.getElementById('bankFilter');
+    const current = select.value || 'all';
+    const subjects = [...new Set(bankQuestions.map(q => q.subject).filter(Boolean))].sort();
+    select.innerHTML = '<option value="all">All subjects</option>' +
+      subjects.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+    select.value = subjects.includes(current) || current === 'all' ? current : 'all';
+  }
+
+  async function loadBank() {
+    try {
+      const data = await api('admin/questions/list.php?subject=all');
+      bankQuestions = data.questions || [];
+      refreshBankFilterOptions();
+      paintBank(document.getElementById('bankFilter').value || 'all');
+    } catch (err) {
+      document.getElementById('bankTable').innerHTML =
+        `<tr><td colspan="4" style="padding:24px; color:var(--red);">${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  document.getElementById('bankFilter').addEventListener('change', e => paintBank(e.target.value));
+
+  document.getElementById('addBankForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const subject = document.getElementById('bankSubject');
+    const text = document.getElementById('bankQuestionText');
+    const a = document.getElementById('bankOptA');
+    const b = document.getElementById('bankOptB');
+    const c = document.getElementById('bankOptC');
+    const d = document.getElementById('bankOptD');
+    const btn = this.querySelector('button[type="submit"]');
+
+    [subject, text, a, b, c, d].forEach(clearFieldError);
+    let valid = true;
+    if (!subject.value.trim()) { showFieldError(subject, 'Enter a subject code.'); valid = false; }
+    if (!text.value.trim()) { showFieldError(text, 'Enter the question text.'); valid = false; }
+    if (!a.value.trim() || !b.value.trim() || !c.value.trim() || !d.value.trim()) {
+      alert('Fill in all four options.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    btn.disabled = true;
+    try {
+      await api('admin/questions/create.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          subject_code: subject.value.trim(),
+          topic: document.getElementById('bankTopic').value.trim(),
+          question_text: text.value.trim(),
+          option_a: a.value.trim(),
+          option_b: b.value.trim(),
+          option_c: c.value.trim(),
+          option_d: d.value.trim(),
+          correct_option: document.getElementById('bankCorrect').value
+        })
+      });
+      this.reset();
+      document.getElementById('bankCorrect').value = 'A';
+      await loadBank();
+    } catch (err) {
+      alert(err.message || 'Could not add question.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  function openEditQuestion(id) {
+    const q = bankQuestions.find(x => x.id === id);
+    if (!q) return;
+    document.getElementById('editQuestionId').value = q.id;
+    document.getElementById('editQuestionSubject').value = q.subject || '';
+    document.getElementById('editQuestionTopic').value = q.topic || '';
+    document.getElementById('editQuestionText').value = q.text || '';
+    document.getElementById('editOptA').value = q.option_a || '';
+    document.getElementById('editOptB').value = q.option_b || '';
+    document.getElementById('editOptC').value = q.option_c || '';
+    document.getElementById('editOptD').value = q.option_d || '';
+    document.getElementById('editCorrect').value = q.correct_option || 'A';
+    openModal('editQuestionModal');
+  }
+
+  document.getElementById('editQuestionForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const id = Number(document.getElementById('editQuestionId').value);
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      await api('admin/questions/update.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          id,
+          subject_code: document.getElementById('editQuestionSubject').value.trim(),
+          topic: document.getElementById('editQuestionTopic').value.trim(),
+          question_text: document.getElementById('editQuestionText').value.trim(),
+          option_a: document.getElementById('editOptA').value.trim(),
+          option_b: document.getElementById('editOptB').value.trim(),
+          option_c: document.getElementById('editOptC').value.trim(),
+          option_d: document.getElementById('editOptD').value.trim(),
+          correct_option: document.getElementById('editCorrect').value
+        })
+      });
+      closeModal('editQuestionModal');
+      await loadBank();
+    } catch (err) {
+      alert(err.message || 'Update failed.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  function confirmDeleteQuestion(id) {
+    window.pendingDeleteQuestionId = id;
+    openModal('deleteQuestionModal');
+  }
+
+  async function deleteQuestionConfirmed() {
+    try {
+      await api('admin/questions/delete.php', {
+        method: 'POST',
+        body: JSON.stringify({ id: window.pendingDeleteQuestionId })
+      });
+      closeModal('deleteQuestionModal');
+      await loadBank();
+    } catch (err) {
+      alert(err.message || 'Could not delete question.');
+      closeModal('deleteQuestionModal');
+    }
+  }
+
+  // -------- Results (API) --------
+  let adminResults = [];
+  const resultFilter = document.getElementById('resultFilter');
+
+  function refreshResultExamFilter() {
+    const keep = resultFilter.value || 'all';
+    resultFilter.innerHTML = '<option value="all">All exams</option>';
+    exams.forEach(exam => {
+      const opt = document.createElement('option');
+      opt.value = String(exam.id);
+      opt.textContent = exam.title;
+      resultFilter.appendChild(opt);
+    });
+    resultFilter.value = [...resultFilter.options].some(o => o.value === keep) ? keep : 'all';
+  }
+
+  function paintResults(filter) {
+    const rows = filter === 'all'
+      ? adminResults
+      : adminResults.filter(r => String(r.exam_id) === String(filter));
+    document.getElementById('resultsTable').innerHTML =
+      '<tr><th>Student</th><th>Roll</th><th>Exam</th><th>Score</th><th>Submitted</th><th></th></tr>' +
+      (rows.length ? rows.map(r => `<tr>
+        <td>${escapeHtml(r.student)}</td>
+        <td>${escapeHtml(r.roll)}</td>
+        <td>${escapeHtml(r.exam)}</td>
+        <td><strong>${r.score}</strong> / ${r.total}</td>
+        <td style="color:var(--ink-soft);">${escapeHtml(r.submitted)}</td>
+        <td><button class="btn-secondary" style="padding:6px 10px; font-size:12px;" onclick="openAttemptReview(${r.attempt_id})">Review</button></td>
+      </tr>`).join('')
+      : '<tr><td colspan="6"><div class="empty-state"><div class="glyph">&#128200;</div><h4>No submissions yet</h4><p>Results appear here once students submit this exam.</p></div></td></tr>');
+  }
+
+  async function openAttemptReview(attemptId) {
+    try {
+      const data = await api(`admin/results/detail.php?attempt_id=${attemptId}`);
+      const r = data.result;
+      document.getElementById('reviewModalTitle').textContent = r.title;
+      document.getElementById('reviewModalMeta').textContent =
+        `${r.student} (${r.roll}) · ${r.score}/${r.total_marks} · ${r.submitted}`;
+      document.getElementById('reviewModalBody').innerHTML = (r.review || []).map((item, i) => `
+        <div class="review-row">
+          <div class="review-mark ${item.ok ? 'correct' : 'wrong'}">${item.ok ? '✓' : '✕'}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;">${i + 1}. ${escapeHtml(item.question_text)}</div>
+            <div style="color:var(--ink-soft);">Answer: <span style="color:${item.ok ? 'var(--green)' : 'var(--red)'}; font-weight:600;">${escapeHtml(item.your)}</span></div>
+            ${!item.ok ? `<div style="color:var(--ink-soft);">Correct: <span style="color:var(--green); font-weight:600;">${escapeHtml(item.correct)}</span></div>` : ''}
+          </div>
+        </div>
+      `).join('') || '<p style="color:var(--ink-soft);">No answers recorded.</p>';
+      openModal('attemptReviewModal');
+    } catch (err) {
+      alert(err.message || 'Could not load review.');
+    }
+  }
+
+  async function loadResults() {
+    try {
+      const data = await api('admin/results/list.php?exam_id=all');
+      adminResults = data.results || [];
+      paintResults(resultFilter.value || 'all');
+    } catch (err) {
+      document.getElementById('resultsTable').innerHTML =
+        `<tr><td colspan="5" style="padding:24px; color:var(--red);">${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  resultFilter.addEventListener('change', e => paintResults(e.target.value));
+
+  function viewExamResults(examIdOrTitle) {
+    const byId = exams.find(e => String(e.id) === String(examIdOrTitle));
+    const byTitle = exams.find(e => e.title === examIdOrTitle);
+    const exam = byId || byTitle;
+    resultFilter.value = exam ? String(exam.id) : 'all';
+    paintResults(resultFilter.value);
+    goto('results');
+  }
+
+  // -------- Question builder (Create Exam tab) --------
+  let qCount = 0;
+  const questionList = document.getElementById('questionList');
+
+  function addQuestionBlock(prefill) {
+    qCount += 1;
+    const idx = qCount;
+    const p = prefill || {};
+    const block = document.createElement('div');
+    block.className = 'q-block';
+    block.dataset.qIndex = String(idx);
+    block.innerHTML = `
+      <span class="q-num">Question ${idx}</span>
+      <div class="field" style="margin-bottom:12px;">
+        <input type="text" class="q-text" placeholder="Type the question text..." value="${escapeHtml(p.text || '')}">
+      </div>
+      ${['A', 'B', 'C', 'D'].map(letter => {
+        const val = p['option_' + letter.toLowerCase()] || (p.options && p.options[letter]) || '';
+        const checked = p.correct_option === letter ? 'checked' : '';
+        return `
+        <div class="opt-row">
+          <input type="radio" name="correct-${idx}" value="${letter}" id="q${idx}-${letter}" ${checked}>
+          <label for="q${idx}-${letter}" class="opt-bubble"></label>
+          <input type="text" class="q-opt" data-opt="${letter}" placeholder="Option ${letter}" value="${escapeHtml(val)}">
+        </div>`;
+      }).join('')}
+      <button type="button" class="btn-ghost" onclick="this.closest('.q-block').remove()">Remove question</button>
+    `;
+    questionList.appendChild(block);
+  }
+  document.getElementById('addQuestionBtn').addEventListener('click', () => addQuestionBlock());
+  addQuestionBlock();
+
+  document.getElementById('importBankBtn').addEventListener('click', () => {
+    const list = document.getElementById('importBankList');
+    if (!bankQuestions.length) {
+      list.innerHTML = '<p style="color:var(--ink-soft);">Question bank is empty. Add questions first.</p>';
+    } else {
+      list.innerHTML = bankQuestions.map(q => `
+        <label style="display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line); cursor:pointer;">
+          <input type="checkbox" value="${q.id}" style="margin-top:4px;">
+          <span>
+            <strong style="font-size:13px;">${escapeHtml(q.text)}</strong><br>
+            <span style="color:var(--ink-soft); font-size:12px;">${escapeHtml(q.subject)} · ${escapeHtml(q.topic || '—')}</span>
+          </span>
+        </label>
+      `).join('');
+    }
+    openModal('importBankModal');
+  });
+
+  document.getElementById('importBankConfirm').addEventListener('click', () => {
+    const ids = [...document.querySelectorAll('#importBankList input[type="checkbox"]:checked')]
+      .map(el => Number(el.value));
+    if (!ids.length) {
+      alert('Select at least one question.');
+      return;
+    }
+    // Remove empty starter block if present
+    const blocks = [...questionList.querySelectorAll('.q-block')];
+    if (blocks.length === 1) {
+      const only = blocks[0];
+      const empty = !only.querySelector('.q-text').value.trim();
+      if (empty) only.remove();
+    }
+    ids.forEach(id => {
+      const q = bankQuestions.find(x => x.id === id);
+      if (q) addQuestionBlock(q);
+    });
+    closeModal('importBankModal');
+  });
+
+  function collectExamQuestions() {
+    const blocks = [...questionList.querySelectorAll('.q-block')];
+    if (!blocks.length) {
+      throw new Error('Add at least one question.');
+    }
+    return blocks.map((block, i) => {
+      const text = block.querySelector('.q-text').value.trim();
+      const opts = {};
+      block.querySelectorAll('.q-opt').forEach(inp => {
+        opts[inp.dataset.opt] = inp.value.trim();
+      });
+      const correctEl = block.querySelector('input[type="radio"]:checked');
+      if (!text || !opts.A || !opts.B || !opts.C || !opts.D) {
+        throw new Error(`Question ${i + 1}: fill in the text and all four options.`);
+      }
+      if (!correctEl) {
+        throw new Error(`Question ${i + 1}: mark the correct option.`);
+      }
+      return {
+        question_text: text,
+        option_a: opts.A,
+        option_b: opts.B,
+        option_c: opts.C,
+        option_d: opts.D,
+        correct_option: correctEl.value,
+        marks: 1
+      };
+    });
+  }
+
+  async function saveExam(status) {
+    const title = document.getElementById('examTitle');
+    const subject = document.getElementById('examSubject');
+    const duration = document.getElementById('examDuration');
+    const marks = document.getElementById('examMarks');
+    const start = document.getElementById('examStart');
+
+    clearFieldError(title);
+    clearFieldError(subject);
+    clearFieldError(start);
+
+    let valid = true;
+    if (!title.value.trim()) {
+      showFieldError(title, 'Enter an exam title.');
+      valid = false;
+    }
+    if (!subject.value.trim()) {
+      showFieldError(subject, 'Enter a subject code.');
+      valid = false;
+    }
+    if (!start.value) {
+      showFieldError(start, 'Choose a start time.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    let questions;
+    try {
+      questions = collectExamQuestions();
+    } catch (err) {
+      alert(err.message);
+      return;
+    }
+
+    const publishBtn = document.getElementById('publishBtn');
+    const draftBtn = document.getElementById('draftBtn');
+    publishBtn.disabled = true;
+    if (draftBtn) draftBtn.disabled = true;
+
+    try {
+      await api('admin/exams/create.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: title.value.trim(),
+          subject_code: subject.value.trim(),
+          duration_minutes: Number(duration.value) || 30,
+          total_marks: Number(marks.value) || questions.length,
+          start_time: start.value,
+          status,
+          questions
+        })
+      });
+      document.getElementById('examForm').reset();
+      questionList.innerHTML = '';
+      qCount = 0;
+      addQuestionBlock();
+      await loadExams();
+      await loadBank();
+      if (status === 'published') {
+        openModal('publishModal');
+      } else {
+        alert('Exam saved as draft.');
+        goto('manage');
+      }
+    } catch (err) {
+      alert(err.message || 'Could not save exam.');
+    } finally {
+      publishBtn.disabled = false;
+      if (draftBtn) draftBtn.disabled = false;
+    }
+  }
+
+  document.getElementById('publishBtn').addEventListener('click', () => saveExam('published'));
+  document.getElementById('draftBtn').addEventListener('click', () => saveExam('draft'));
+
+  // -------- Manage Users --------
+  document.querySelectorAll('#userRoleToggle .role-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#userRoleToggle .role-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      const role = opt.getAttribute('data-role');
+      document.getElementById('userRoleInput').value = role;
+      document.getElementById('userRoll').parentElement.querySelector('label').textContent =
+        role === 'admin' ? 'Faculty / Employee ID' : 'Roll / Registration no.';
+      document.getElementById('userEmail').placeholder =
+        role === 'admin' ? 'teacher@gmail.com' : 'student@gmail.com';
+    });
+  });
+
+  function userRow(u) {
+    return `<tr>
+      <td><strong>${escapeHtml(u.name)}</strong></td>
+      <td>${escapeHtml(u.roll_or_id || '—')}</td>
+      <td>${escapeHtml(u.email)}</td>
+      <td><span class="badge">${u.role === 'admin' ? 'Admin / Teacher' : 'Student'}</span></td>
+      <td style="color:var(--ink-soft);">${escapeHtml(formatDate(u.created_at))}</td>
+      <td class="row-actions">
+        <button class="icon-btn" title="Edit" onclick="openEditUser(${u.id})">&#9998;</button>
+        <button class="icon-btn danger" title="Remove" onclick="confirmRemoveUser(${u.id})">&#128465;</button>
+      </td>
+    </tr>`;
+  }
+
+  function paintUsersTable(filter) {
+    const rows = usersCache.filter(u => filter === 'all' || u.role === filter);
+    document.getElementById('usersTable').innerHTML =
+      '<tr><th>Name</th><th>Roll / ID</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr>' +
+      (rows.length ? rows.map(userRow).join('')
+        : '<tr><td colspan="6"><div class="empty-state"><div class="glyph">&#128101;</div><h4>No users yet</h4><p>Accounts created here will appear in this list.</p></div></td></tr>');
+  }
+
+  async function loadUsers() {
+    const filter = document.getElementById('userFilter').value || 'all';
+    document.getElementById('usersTable').innerHTML =
+      '<tr><td colspan="6" style="padding:24px; color:var(--ink-soft);">Loading users…</td></tr>';
+    try {
+      const data = await api('admin/users/list.php?role=all');
+      usersCache = data.users || [];
+      paintUsersTable(filter);
+    } catch (err) {
+      document.getElementById('usersTable').innerHTML =
+        `<tr><td colspan="6" style="padding:24px; color:var(--red);">${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  document.getElementById('userFilter').addEventListener('change', e => paintUsersTable(e.target.value));
+
+  function openEditUser(id) {
+    const u = usersCache.find(x => x.id === id);
+    if (!u) return;
+    document.getElementById('editUserId').value = u.id;
+    document.getElementById('editUserName').value = u.name;
+    document.getElementById('editUserRoll').value = u.roll_or_id || '';
+    document.getElementById('editUserEmail').value = u.email;
+    openModal('editUserModal');
+  }
+
+  document.getElementById('editUserForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const id = Number(document.getElementById('editUserId').value);
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      await api('admin/users/update.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          id,
+          name: document.getElementById('editUserName').value.trim(),
+          roll_or_id: document.getElementById('editUserRoll').value.trim(),
+          email: document.getElementById('editUserEmail').value.trim()
+        })
+      });
+      closeModal('editUserModal');
+      await loadUsers();
+      requireAdminSession();
+    } catch (err) {
+      alert(err.message || 'Update failed.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  function confirmRemoveUser(id) {
+    window.pendingRemoveUserId = id;
+    openModal('removeUserModal');
+  }
+
+  async function removeUserConfirmed() {
+    const id = window.pendingRemoveUserId;
+    try {
+      await api('admin/users/delete.php', {
+        method: 'POST',
+        body: JSON.stringify({ id })
+      });
+      closeModal('removeUserModal');
+      await loadUsers();
+    } catch (err) {
+      alert(err.message || 'Could not remove user.');
+      closeModal('removeUserModal');
+    }
+  }
+
+  document.getElementById('createUserForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const name = document.getElementById('userFullName');
+    const email = document.getElementById('userEmail');
+    const password = document.getElementById('userPassword');
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const errors = [];
+
+    clearFieldError(name);
+    clearFieldError(email);
+    clearFieldError(password);
+
+    if (!name.value.trim()) {
+      errors.push('Enter a full name.');
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+      errors.push('Enter a valid email address.');
+    }
+    if (password.value.length < 6) {
+      errors.push('Password must be at least 6 characters.');
+    }
+    if (errors.length) {
+      // #region agent log
+      fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'error-modal',hypothesisId:'A',location:'admin/dashboard.html:createUserValidate',message:'validation failed -> modal',data:{errorCount:errors.length,usedInline:false},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      showErrorModal(errors.join('\n'));
+      return;
+    }
+
+    window.__pendingCreateUser = {
+      name: name.value.trim(),
+      email: email.value.trim().toLowerCase(),
+      password: password.value,
+      role: document.getElementById('userRoleInput').value,
+      roll_or_id: document.getElementById('userRoll').value.trim()
+    };
+
+    submitBtn.disabled = true;
+    try {
+      // #region agent log
+      fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'email-verify',hypothesisId:'A',location:'admin/dashboard.html:createUser',message:'requesting create otp',data:{emailDomain:(window.__pendingCreateUser.email.split('@')[1]||''),role:window.__pendingCreateUser.role},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      const data = await api('admin/users/send-create-otp.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: window.__pendingCreateUser.email,
+          name: window.__pendingCreateUser.name
+        })
+      });
+      document.getElementById('verifyEmailTarget').textContent = window.__pendingCreateUser.email;
+      document.getElementById('createUserOtp').value = '';
+      const hint = document.getElementById('createUserOtpHint');
+      if (data.debug_otp) {
+        hint.textContent = 'Dev mode code: ' + data.debug_otp + ' (also in backend/storage/mail.log)';
+      } else {
+        hint.textContent = 'Check the inbox for the verification code.';
+      }
+      openModal('verifyEmailModal');
+    } catch (err) {
+      showErrorModal(err.message || 'Could not send verification code.');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  async function finishCreateUser() {
+    const pending = window.__pendingCreateUser;
+    const otpInput = document.getElementById('createUserOtp');
+    if (!pending) {
+      closeModal('verifyEmailModal');
+      return;
+    }
+    if (!/^\d{6}$/.test((otpInput.value || '').trim())) {
+      showErrorModal('Enter the 6-digit code from the email.');
+      return;
+    }
+    const btn = document.getElementById('confirmCreateUserBtn');
+    btn.disabled = true;
+    try {
+      await api('admin/users/create.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...pending,
+          otp: otpInput.value.trim()
+        })
+      });
+      // #region agent log
+      fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'email-verify',hypothesisId:'A',location:'admin/dashboard.html:finishCreateUser',message:'account created after verify',data:{role:pending.role},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      closeModal('verifyEmailModal');
+      window.__pendingCreateUser = null;
+      document.getElementById('createUserForm').reset();
+      document.querySelectorAll('#userRoleToggle .role-option')[0].click();
+      document.getElementById('userFilter').value = 'all';
+      await loadUsers();
+      openModal('userCreatedModal');
+    } catch (err) {
+      showErrorModal(err.message || 'Could not create account.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('confirmCreateUserBtn').addEventListener('click', finishCreateUser);
+  document.getElementById('resendCreateOtpBtn').addEventListener('click', async () => {
+    const pending = window.__pendingCreateUser;
+    if (!pending) return;
+    try {
+      const data = await api('admin/users/send-create-otp.php', {
+        method: 'POST',
+        body: JSON.stringify({ email: pending.email, name: pending.name })
+      });
+      const hint = document.getElementById('createUserOtpHint');
+      if (data.debug_otp) {
+        hint.textContent = 'New dev mode code: ' + data.debug_otp;
+      } else {
+        hint.textContent = 'A new code was sent.';
+      }
+    } catch (err) {
+      alert(err.message || 'Could not resend code.');
+    }
+  });
+</script>
+
+</body>
+</html>

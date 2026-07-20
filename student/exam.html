@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam in progress</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .exam-shell { display:grid; grid-template-columns: 1fr 260px; gap:24px; max-width:1080px; margin:0 auto; padding:24px 20px 60px; }
+  @media (max-width:820px){ .exam-shell{ grid-template-columns:1fr; } .exam-nav{ order:-1; } }
+  .exam-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:5; }
+  .exam-nav { position:sticky; top:78px; align-self:start; }
+</style>
+</head>
+<body>
+
+<div class="exam-header">
+  <div>
+    <div style="font-family:'Roboto',serif; font-weight:600; color:var(--navy); font-size:15px;" id="examTitle">Loading…</div>
+    <div style="font-size:12px; color:var(--ink-soft);" id="examMeta"></div>
+  </div>
+  <div class="exam-timer" id="timerDisplay">--:--</div>
+</div>
+
+<div class="exam-shell">
+  <div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div style="font-size:12.5px; color:var(--ink-soft); margin:8px 0 20px;" id="progressLabel">Loading questions…</div>
+
+    <div id="questionArea"></div>
+
+    <div style="display:flex; justify-content:space-between; margin-top:18px;">
+      <button class="btn-secondary" id="prevBtn" disabled>&larr; Previous</button>
+      <button class="btn-secondary" id="nextBtn" disabled>Next &rarr;</button>
+    </div>
+  </div>
+
+  <aside class="exam-nav">
+    <div class="card">
+      <div class="card-head"><h3 style="font-size:14px;">Question navigator</h3></div>
+      <div class="card-body">
+        <div class="jump-grid" id="jumpGrid"></div>
+        <button class="btn-primary" style="margin-top:18px;" id="submitBtn" disabled>Submit exam</button>
+        <div style="font-size:11.5px; color:var(--ink-soft); margin-top:8px; text-align:center;">
+          Auto-submits when the timer reaches zero.
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="modal-overlay" id="submitExamModal">
+  <div class="modal">
+    <h3>Submit this exam?</h3>
+    <p id="submitExamSummary"></p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('submitExamModal')">Keep reviewing</button>
+      <button class="btn-primary" style="width:auto;" onclick="closeModal('submitExamModal'); doSubmitExam();">Submit exam</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="timeUpModal">
+  <div class="modal">
+    <h3>Time is up</h3>
+    <p>Your exam has been submitted automatically. You'll be taken to your result now.</p>
+    <div class="modal-actions">
+      <button class="btn-primary" style="width:auto;" onclick="doSubmitExam();">Continue</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/main.js?v=20260720r"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const examId = Number(params.get('id') || 0);
+
+  let QUESTIONS = [];
+  let answers = []; // letter A-D or null
+  let current = 0;
+  let attemptId = null;
+  let submitting = false;
+  let timerHandle = null;
+  const letters = ['A', 'B', 'C', 'D'];
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderQuestion() {
+    if (!QUESTIONS.length) return;
+    const q = QUESTIONS[current];
+    const opts = letters.map(L => ({ letter: L, text: q.options[L] }));
+    document.getElementById('questionArea').innerHTML = `
+      <div class="q-block">
+        <span class="q-num">Question ${current + 1} of ${QUESTIONS.length}</span>
+        <h3 style="font-size:16px; font-weight:600; color:var(--ink); font-family:'Roboto'; margin-bottom:16px;">${escapeHtml(q.text)}</h3>
+        ${opts.map(opt => `
+          <label class="omr-option">
+            <input type="radio" name="ans" value="${opt.letter}" ${answers[current] === opt.letter ? 'checked' : ''} onchange="selectAnswer('${opt.letter}')">
+            <span class="omr-letter">${opt.letter}</span>
+            <span class="omr-text">${escapeHtml(opt.text)}</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('prevBtn').style.opacity = current === 0 ? 0.5 : 1;
+    document.getElementById('nextBtn').textContent = current === QUESTIONS.length - 1 ? 'Review' : 'Next →';
+    renderJumpGrid();
+    renderProgress();
+  }
+
+  async function selectAnswer(letter) {
+    answers[current] = letter;
+    renderJumpGrid();
+    renderProgress();
+    const q = QUESTIONS[current];
+    try {
+      await api('student/exams/save-answer.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          attempt_id: attemptId,
+          exam_question_id: q.id,
+          selected_option: letter
+        })
+      });
+    } catch (err) {
+      if (err.data && err.data.time_up) {
+        openModal('timeUpModal');
+        return;
+      }
+      console.warn('Autosave failed:', err.message);
+    }
+  }
+
+  function renderJumpGrid() {
+    document.getElementById('jumpGrid').innerHTML = QUESTIONS.map((_, i) => `
+      <button type="button" class="jump-cell ${answers[i] ? 'answered' : ''} ${i === current ? 'current' : ''}"
+        onclick="current=${i}; renderQuestion();">${i + 1}</button>
+    `).join('');
+  }
+
+  function renderProgress() {
+    const answeredCount = answers.filter(a => a).length;
+    document.getElementById('progressLabel').textContent = `${answeredCount} of ${QUESTIONS.length} answered`;
+    document.getElementById('progressFill').style.width = `${(answeredCount / QUESTIONS.length) * 100}%`;
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (current > 0) { current--; renderQuestion(); }
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (current < QUESTIONS.length - 1) { current++; renderQuestion(); }
+  });
+  document.getElementById('submitBtn').addEventListener('click', confirmSubmitExam);
+
+  function confirmSubmitExam() {
+    const answeredCount = answers.filter(a => a).length;
+    const unanswered = QUESTIONS.length - answeredCount;
+    document.getElementById('submitExamSummary').textContent = unanswered > 0
+      ? `You've answered ${answeredCount} of ${QUESTIONS.length} questions. ${unanswered} question(s) are still unanswered. Submit anyway?`
+      : `You've answered all ${QUESTIONS.length} questions. Once submitted, you can't change your answers.`;
+    openModal('submitExamModal');
+  }
+
+  async function doSubmitExam() {
+    if (submitting || !attemptId) return;
+    submitting = true;
+    if (timerHandle) clearInterval(timerHandle);
+    try {
+      const data = await api('student/exams/submit.php', {
+        method: 'POST',
+        body: JSON.stringify({ attempt_id: attemptId })
+      });
+      window.location.href = data.redirect || `result.html?attempt_id=${attemptId}`;
+    } catch (err) {
+      submitting = false;
+      alert(err.message || 'Submit failed.');
+    }
+  }
+
+  (async () => {
+    try {
+      await api('auth/me.php');
+    } catch (_) {
+      window.location.href = '../login.html';
+      return;
+    }
+
+    if (!examId) {
+      alert('Missing exam id.');
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    try {
+      const data = await api(`student/exams/start.php?exam_id=${examId}`);
+      attemptId = data.attempt_id;
+      QUESTIONS = data.questions || [];
+      answers = QUESTIONS.map(q => q.selected || null);
+
+      document.title = data.exam.title + ' | Exam in progress';
+      document.getElementById('examTitle').textContent = data.exam.title;
+      document.getElementById('examMeta').textContent =
+        `${data.exam.subject} · ${QUESTIONS.length} questions · ${data.exam.total_marks} marks`;
+
+      document.getElementById('prevBtn').disabled = false;
+      document.getElementById('nextBtn').disabled = false;
+      document.getElementById('submitBtn').disabled = false;
+
+      const remaining = Math.max(0, Number(data.remaining_seconds) || 0);
+      // #region agent log
+      fetch('http://127.0.0.1:7578/ingest/2dc8a71c-1580-4782-8139-68ca44edb8d0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20c118'},body:JSON.stringify({sessionId:'20c118',runId:'countdown-sound',hypothesisId:'C,D',location:'student/exam.html:start',message:'exam timer remaining',data:{remaining,hasStartExamTimer:typeof startExamTimer==='function',hasPlayTick:typeof playCountdownTick==='function'},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      if (remaining <= 0) {
+        openModal('timeUpModal');
+        return;
+      }
+
+      const timerEl = document.getElementById('timerDisplay');
+      // Unlock audio on the same user-gesture path that started the exam
+      try {
+        if (typeof ensureTickAudio === 'function') ensureTickAudio();
+        else if (window.AudioContext || window.webkitAudioContext) {
+          const c = new (window.AudioContext || window.webkitAudioContext)();
+          c.resume();
+        }
+      } catch (_) {}
+      timerHandle = startExamTimer(remaining, rem => {
+        timerEl.textContent = formatClock(rem);
+        timerEl.classList.toggle('low', rem <= 60);
+      }, () => openModal('timeUpModal'));
+
+      renderQuestion();
+    } catch (err) {
+      alert(err.message || 'Could not start exam.');
+      if (err.data && err.data.redirect) {
+        window.location.href = err.data.redirect;
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    }
+  })();
+</script>
+</body>
+</html>

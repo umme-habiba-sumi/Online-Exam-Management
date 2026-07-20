@@ -1,0 +1,31 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "functions": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.7.4",
+      "memory": 1024,
+      "maxDuration": 30,
+      "includeFiles": "{backend/**,backend/storage/exam_portal.sqlite}"
+    },
+    "api/health.php": {
+      "runtime": "vercel-php@0.7.4"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.php?path=$1" },
+    { "source": "/backend/api/(.*)", "destination": "/api/index.php?path=$1" },
+    { "source": "/student", "destination": "/student/dashboard.html" },
+    { "source": "/admin", "destination": "/admin/dashboard.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/backend/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
